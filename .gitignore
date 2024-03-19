@@ -276,3 +276,7 @@ tictactoe/media/
 .pytest_cache/
 
 **/static/assets/
+
+
+# Admin Login
+whodat/login_info.txt
