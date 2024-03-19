@@ -12,7 +12,7 @@
 ## The Team
 
 Mostly just to make sure you each have access and can pull and push to the repo, add your name here:
-1. IName
+1. Abdulrahman
 1. MeName
 1. MeName
 1. MineName
