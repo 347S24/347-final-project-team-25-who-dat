@@ -1,6 +1,12 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView
+from .models import Role, User, Student, Teacher, TeachingAssistant, Course, Attendance, Flashcard
 
-# Create your views here.
-class HomepageView(TemplateView):
-    template_name = 'index.html'
+def homepage(request):
+    return render(request, 'index.html')
+
+def game(request):
+    return render(request, 'game.html')
+
+def attendance(request):
+    return render(request, 'attendance.html')
