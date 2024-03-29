@@ -8,5 +8,9 @@
 <body>
     <h1>Attendance Sheet</h1>
     <p>This is the where you take attendance.</p>
+    <ul>
+        {% for product in products %}
+            <li>{{ product.name }} - ${{ product.price }}</li>
+        {% endfor %}    </ul>
 </body>
 </html>
