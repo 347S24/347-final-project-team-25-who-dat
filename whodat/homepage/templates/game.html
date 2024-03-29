@@ -51,16 +51,29 @@
 
             {% for student in random_students  %}
 
-                <div class="answer-card">
-                    <h5 class="card-title">{{ student }}</h5>
-                </div>
+                <button class="answer-button" onclick="checkAnswer(this, '{{ student }}', '{{ answer }}')">
+                    <div class="answer-card">
+                        <h5 class="card-title">{{ student }}</h5>
+                    </div>
+                </button>
 
             {% endfor %}
 
         </div>
 
+        <script>
+            function checkAnswer(element, selection, answer) {
+                if (selection === answer) {
+                    element.style.backgroundColor = "green";
+
+                } else {
+                    element.style.backgroundColor = "red";
+                }
+            }
+        </script>
+
         <div class="next-question">
-            <button onclick="location.href='{% url 'game' %}'">Next</button>
+            <button class="nextButton" onclick="location.href='.'">Next</button>
         </div>
 
     {% elif mode == 'photo' %}
@@ -73,16 +86,29 @@
 
             {% for student in random_students  %}
 
-                <div class="answer-card">
-                    <img class="card-img-top" id="answer-img" src="{% static 'images/profile.jpeg' %}" alt="Answer image">
-                </div>
+                <button class="answer-button" onclick="checkAnswer(this, '{{ student }}', '{{ answer }}')">
+                    <div class="answer-card">
+                        <img class="card-img-top" id="answer-img" src="{% static 'images/profile.jpeg' %}" alt="Answer image">
+                    </div>
+                </button>
 
             {% endfor %}
 
         </div>
 
+        <script>
+            function checkAnswer(element, selection, answer) {
+                if (selection === answer) {
+                    element.style.backgroundColor = "green";
+
+                } else {
+                    element.style.backgroundColor = "red";
+                }
+            }
+        </script>
+
         <div class="next-question">
-            <button onclick="location.href='{% url 'game' %}'">Next</button>
+            <button class="nextButton" onclick="location.href='.'">Next</button>
         </div>
 
     {% else %}

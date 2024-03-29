@@ -33,7 +33,8 @@
 }
 
 #question-img {
-    
+    width: 25%;
+    height: auto;
 }
 
 #answer-container {
@@ -43,7 +44,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 10vw;
-    background-color: pink;
+    background-color: rgb(255, 192, 203);
 }
 
 .answer-card {
@@ -60,7 +61,7 @@
     align-items: center;
 }
 
-button {
+.nextButton {
     margin-top: 20px; 
     padding: 10px 20px;
     border: none;
@@ -69,7 +70,14 @@ button {
     color: white;
 }
 
-button:hover {
+.nextButton:hover {
     background-color: white;
     color: #0056b3;
+}
+
+.answer-button {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: white;
 }
