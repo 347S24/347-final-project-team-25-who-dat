@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses</title>
+</head>
+<body>
+    <h2>My Courses</h2>
+    {% if courses %}
+        <ul>
+            {% for course in courses %}
+                <li>
+                    <strong>{{ course.name }}</strong> - {{ course.schedule_days }} at {{ course.schedule_time }}
+                    <br>
+                    Room: {{ course.room_number }} | Instructor: {{ course.instructor }}
+                    <br>
+                    Description: {{ course.description }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No courses to display.</p>
+    {% endif %}
+</body>
+</html>

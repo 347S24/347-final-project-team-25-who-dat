@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from homepage.views import homepage, attendance, game
+from homepage.views import homepage, attendance, game, my_courses
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,4 +9,5 @@ urlpatterns = [
     path('game/', game, {'mode': 'study'}, name='game'),
     path('game/name/', game, {'mode': 'name'}, name='game_name'),
     path('game/photo/', game, {'mode': 'photo'}, name='game_photo'),
+    path('my-courses/', my_courses, name='my-courses'),
 ]

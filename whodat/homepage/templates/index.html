@@ -4,9 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
+    <style>
+        .course-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to Whodat</h1>
     <p>This is the homepage.</p>
+
+    <!-- Link to My Courses page -->
+    <a href="{% url 'my-courses' %}" class="course-button">My Courses</a>
 </body>
 </html>
