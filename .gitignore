@@ -280,3 +280,5 @@ tictactoe/media/
 
 # Admin Login
 whodat/login_info.txt
+
+tictactoe/templates/
