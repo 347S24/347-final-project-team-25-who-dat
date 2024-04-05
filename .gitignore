@@ -271,7 +271,7 @@ tags
 dump.rdb
 
 ### Project template
-tictactoe/media/
+whodat/media/
 
 .pytest_cache/
 
@@ -281,4 +281,4 @@ tictactoe/media/
 # Admin Login
 whodat/login_info.txt
 
-tictactoe/templates/
+whodat/templates/

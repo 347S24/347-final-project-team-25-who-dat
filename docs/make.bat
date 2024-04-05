@@ -10,7 +10,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=_source
 set BUILDDIR=_build
-set APP=..\tictactoe
+set APP=..\whodat
 
 if "%1" == "" goto help
 
