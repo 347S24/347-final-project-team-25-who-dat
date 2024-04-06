@@ -1,6 +1,7 @@
 from django.db import models
 import random
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from whodat.users.models import User
 from PIL import Image
 
 class Role(models.Model):
@@ -9,31 +10,6 @@ class Role(models.Model):
     def __str__(self):
         return self.name
     
-class User(AbstractUser):
-    phone_number = models.CharField(max_length=15, blank=True)
-    roles = models.ManyToManyField(Role)
-    photo = models.ImageField(upload_to='user_photos/', blank=True)
-    preferred_name = models.CharField(max_length=100, blank=True)
-    pronouns = models.CharField(max_length=50, blank=True)
-
-    # Custom related_name for groups and user_permissions
-    groups = models.ManyToManyField(Group, related_name='homepage_users_groups')
-    user_permissions = models.ManyToManyField(
-        Permission,
-        verbose_name='user permissions',
-        blank=True,
-        related_name='homepage_users_permissions'
-    )
-
-    def update_profile(self, **kwargs):
-        for field, value in kwargs.items():
-            if hasattr(self, field):
-                setattr(self, field, value)
-        self.save()
-
-    def __str__(self):
-        return self.username
-
 class Student(User):
     student_id = models.CharField(max_length=10, unique=True)
 

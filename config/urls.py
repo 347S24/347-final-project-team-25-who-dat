@@ -2,19 +2,22 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include
+from django.urls import include, re_path
 from django.urls import path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 from .views import HomeView
-# from whodat.homepage.views import homepage
 
+# from whodat.homepage.views import homepage
+from homepage import views
 
 urlpatterns = [
-    # path("", TemplateView.as_view(template_name="index.html"), name="home"),
+    path("", TemplateView.as_view(template_name="index.html"), name="home"),
     # path("", homepage, name="home"),
-    path("whodat/", include('whodat.homepage.urls')),
+    # path("whodat/", include('whodat.homepage.urls')),
+    # path('', views.homepage, name='index'),
+    path("homepage/", include('homepage.urls')),
     path(
         "about/",
         TemplateView.as_view(template_name="pages/about.html"),
@@ -25,6 +28,7 @@ urlpatterns = [
     # User management
     path("users/", include("whodat.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
+    re_path(r".*", HomeView.as_view(), name="home"),
     # Your stuff: custom urls includes go here
     # ...
     # Media files

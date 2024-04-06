@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
-from .models import Role, User, Student, Teacher, TeachingAssistant, Course, Attendance, Flashcard
+# from .models import Role, User, Student, Teacher, TeachingAssistant, Course, Attendance, Flashcard
+from .models import Role, Student, Teacher, TeachingAssistant, Course, Attendance, Flashcard
 import random
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 
 def homepage(request):
-    return render(request, 'index.html')
+    return render(request, 'homepage/index.html')
 
 @login_required
 def game(request, mode):

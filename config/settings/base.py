@@ -87,7 +87,8 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "whodat.users",
-    "whodat.homepage.apps.HomepageConfig"
+    "homepage.apps.HomepageConfig",
+    # "whodat.canvas",
 
     # "whodat.homepage",
     # Your stuff: custom apps go here
