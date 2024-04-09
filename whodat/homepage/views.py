@@ -18,11 +18,11 @@ def game(request, mode):
     random_students = random.sample(course, 4)
     answer = random.choice(random_students)
 
-    return render(request, 'game.html', {'random_students': random_students, 'answer': answer, 'course': course, 'mode': mode})
+    return render(request, 'homepage/game.html', {'random_students': random_students, 'answer': answer, 'course': course, 'mode': mode})
 
 def attendance(request):
     course = Course.objects.all()
-    return render(request, 'attendance.html', {'course': course})
+    return render(request, 'homepage/attendance.html', {'course': course})
 
 @login_required
 def my_courses(request):
@@ -38,4 +38,4 @@ def my_courses(request):
         courses = request.user.student.courses.all()
     else:
         return HttpResponseForbidden("You are not authorized to view this page.")
-    return render(request, 'my_courses.html', {'courses': courses})
+    return render(request, 'homepage/my_courses.html', {'courses': courses})
