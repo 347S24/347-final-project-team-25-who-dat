@@ -8,6 +8,8 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        app_label = 'homepage'
     
 class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True)
@@ -24,6 +26,9 @@ class User(AbstractUser):
         blank=True,
         related_name='homepage_users_permissions'
     )
+    class Meta:
+        app_label = 'homepage'
+    
 
     def update_profile(self, **kwargs):
         for field, value in kwargs.items():
@@ -39,6 +44,8 @@ class Student(User):
 
     def __str__(self):
         return f"{self.username} - Student"
+    class Meta:
+        app_label = 'homepage'
     
 class Teacher(User):
     teacher_id = models.CharField(max_length=10, unique=True)
@@ -61,6 +68,8 @@ class Teacher(User):
     def remove_student_from_course(self, student, course):
         course.students.remove(student)
         course.save()
+    class Meta:
+        app_label = 'homepage'
 
 class TeachingAssistant(User):
     ta_id = models.CharField(max_length=10, unique=True)
@@ -68,6 +77,8 @@ class TeachingAssistant(User):
 
     def __str__(self):
         return f"{self.username} - Teaching Assistant"
+    class Meta:
+        app_label = 'homepage'
     
 class Course(models.Model):
     course_id = models.CharField(max_length=10, unique=True)
@@ -86,6 +97,8 @@ class Course(models.Model):
         self.schedule_time = new_time
         self.schedule_days = new_days
         self.save()
+    class Meta:
+        app_label = 'homepage'
 
 class Attendance(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -121,6 +134,8 @@ class Attendance(models.Model):
             'attendance_percentage': attendance_percentage,
             'details': details
         }
+    class Meta:
+        app_label = 'homepage'
 
 class Flashcard(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -134,3 +149,5 @@ class Flashcard(models.Model):
     def shuffle_flashcards(flashcards):
         random.shuffle(flashcards)
         return flashcards
+    class Meta:
+        app_label = 'homepage'

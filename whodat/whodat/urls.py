@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.urls import path
-from homepage.views import homepage, attendance, game, my_courses
+from whodat.homepage.views import homepage, attendance, game, my_courses
 
+app_name = 'whodat'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', homepage, name='homepage'),

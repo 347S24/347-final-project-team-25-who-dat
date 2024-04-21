@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from .models import Role, User, Student, Teacher, TeachingAssistant, Course, Attendance, Flashcard
+from django.contrib.auth.decorators import login_required
 import random
+from django.http import JsonResponse
+from .models import Attendance
+from django.core.serializers import serialize
 
 def homepage(request):
     return render(request, 'index.html')
