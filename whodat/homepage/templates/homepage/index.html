@@ -4,23 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
-        .course-button {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        header {
+            width: 100%;
+            padding: 20px 0;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .content {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        .button {
             display: inline-block;
             padding: 10px 20px;
-            margin: 10px 0;
+            margin: 10px;
             background-color: #007bff;
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .icon {
+            margin-right: 8px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Whodat</h1>
-    <p>This is the homepage.</p>
-
-    <!-- Link to My Courses page -->
-    {% comment %} <a href="{% url 'my-courses' %}" class="course-button">My Courses</a> {% endcomment %}
+    <header>
+        <h1>Welcome to the Whodat Portal!</h1>
+        <p>For Professors and Students of James Madison University.</p>
+    </header>
+    <div class="content">
+        <div class="button-group">
+            <a href="{% url 'homepage:my-courses' %}" class="button">
+                <i class="fas fa-book icon"></i>My Courses
+            </a>
+            <a href="{% url 'homepage:attendance' %}" class="button">
+                <i class="fas fa-calendar-check icon"></i>Attendance
+            </a>
+        </div>
+    </div>
 </body>
 </html>

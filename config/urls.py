@@ -13,7 +13,7 @@ from .views import HomeView
 from homepage import views
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="index.html"), name="home"),
+    path("", TemplateView.as_view(template_name="homepage/index.html"), name="home"),
     # path("", homepage, name="home"),
     # path("whodat/", include('whodat.homepage.urls')),
     # path('', views.homepage, name='index'),
@@ -28,7 +28,9 @@ urlpatterns = [
     # User management
     path("users/", include("whodat.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    re_path(r".*", HomeView.as_view(), name="home"),
+    
+    # this helps react handle any routes that didn't already match django's handling
+    # re_path(r".*", HomeView.as_view(), name="home"),
     # Your stuff: custom urls includes go here
     # ...
     # Media files
