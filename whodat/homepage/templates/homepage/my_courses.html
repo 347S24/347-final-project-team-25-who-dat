@@ -11,7 +11,7 @@
         <ul>
             {% for course in courses %}
                 <li>
-                    <strong><a href="{% url 'attendance' %}">{{ course.name }}</a></strong> - {{ course.schedule_days }} at {{ course.schedule_time }}
+                    <strong><a href="{% url 'homepage:attendance' %}">{{ course.name }}</a></strong> - {{ course.schedule_days }} at {{ course.schedule_time }}
                     <br>
                     Room: {{ course.room_number }} | Instructor: {{ course.instructor }}
                     <br>
