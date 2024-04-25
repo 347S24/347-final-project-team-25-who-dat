@@ -26,16 +26,27 @@ def attendance(request):
 
 @login_required
 def my_courses(request):
-    if hasattr(request.user, 'Teacher'):
+    # print("User:", request.user)
+    # print("User attributes:", request.user.__dict__)
+    
+    if hasattr(request.user, 'teacher'):
+        # print("User is a teacher")
         # Teacher's courses
         courses = Course.objects.filter(instructor=request.user.teacher)
     elif hasattr(request.user, 'teachingassistant'):
+        # print("User is a teaching assistant")
         # Fetch courses supervised by the TA's supervising teacher
         supervising_teacher = request.user.teachingassistant.supervising_teacher
         courses = Course.objects.filter(instructor=supervising_teacher)
-    elif hasattr(request.user, 'Student'):
+    elif hasattr(request.user, 'student'):
+        # print("User is a student")
         # Student's courses
         courses = request.user.student.courses.all()
     else:
+        # print("User is not authorized")
         return HttpResponseForbidden("You are not authorized to view this page.")
+    
+    print("Courses:", courses)
+    
     return render(request, 'homepage/my_courses.html', {'courses': courses})
+

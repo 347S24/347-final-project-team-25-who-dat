@@ -54,6 +54,9 @@
         .icon {
             margin-right: 8px;
         }
+        .center {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -62,14 +65,30 @@
         <p>For Professors and Students of James Madison University.</p>
     </header>
     <div class="content">
-        <div class="button-group">
-            <a href="{% url 'homepage:my-courses' %}" class="button">
-                <i class="fas fa-book icon"></i>My Courses
-            </a>
-            <a href="{% url 'homepage:attendance' %}" class="button">
-                <i class="fas fa-calendar-check icon"></i>Attendance
-            </a>
-        </div>
+        {% if user.is_authenticated %}
+            <p class="center">You are currently logged in as {{ user.username }}!</p>
+            <div class="button-group">
+                <a href="{% url 'homepage:my-courses' %}" class="button">
+                    <i class="fas fa-book icon"></i>My Courses
+                </a>
+                <a href="{% url 'homepage:attendance' %}" class="button">
+                    <i class="fas fa-calendar-check icon"></i>Attendance
+                </a>
+                <a href="{% url 'account_logout' %}" class="button">
+                    <i class="fas fa-sign-out-alt icon"></i>Sign Out
+                </a>
+            </div>
+        {% else %}
+            <p class="center">Please sign in to access your account. Or you can create a new account.</p>
+            <div class="button-group">
+                <a href="{% url 'account_signup' %}" class="button">
+                    <i class="fas fa-user-plus icon"></i>Sign Up
+                </a>
+                <a href="{% url 'account_login' %}" class="button">
+                    <i class="fas fa-sign-in-alt icon"></i>Sign In
+                </a>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>
