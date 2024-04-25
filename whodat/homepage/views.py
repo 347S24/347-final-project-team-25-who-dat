@@ -5,6 +5,8 @@ from .models import Role, Student, Teacher, TeachingAssistant, Course, Attendanc
 import random
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+# from django.shortcuts import get_object_or_404
+
 
 def homepage(request):
     return render(request, 'homepage/index.html')
@@ -22,6 +24,9 @@ def game(request, mode):
 
 def attendance(request):
     course = Course.objects.all()
+    # course = get_object_or_404(Course, id=course_id)
+    # students = course.students.all()
+    # return render(request, 'homepage/attendance.html', {'course': course, 'students': students})
     return render(request, 'homepage/attendance.html', {'course': course})
 
 @login_required

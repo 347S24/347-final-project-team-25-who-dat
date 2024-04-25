@@ -6,11 +6,19 @@
     <title>Attendance</title>
 </head>
 <body>
-    <h1>Attendance Sheet</h1>
-    <p>This is the where you take attendance.</p>
-    <ul>
-        {% for product in products %}
-            <li>{{ product.name }} - ${{ product.price }}</li>
-        {% endfor %}    </ul>
+    <h2>Attendance Sheet for {{ course.name }}</h2>
+    <p>Room: {{ course.room_number }}</p>
+    <p>Instructor: {{ course.instructor }}</p>
+    <p>Schedule: {{ course.schedule_days }} at {{ course.schedule_time }}</p>
+    <h3>Enrolled Students</h3>
+    {% if students %}
+        <ul>
+            {% for student in students %}
+                <li>{{ student.user.username }} - ${{ student.student_id }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No students enrolled.</p>
+    {% endif %}
 </body>
 </html>
