@@ -12,7 +12,6 @@ class Role(models.Model):
     
 class Student(User):
     student_id = models.CharField(max_length=10, unique=True)
-
     def __str__(self):
         return f"{self.username} - Student"
     
@@ -64,12 +63,17 @@ class Course(models.Model):
         self.save()
 
 class Attendance(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     date = models.DateField()
-    students_present = models.ManyToManyField(Student)
+    status = models.CharField(max_length=10, choices=[
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('excused', 'Excused'),
+        ('none', 'None')
+    ], default='none')
 
     def __str__(self):
-        return f'{self.course.name} - {self.date}'
+        return f"{self.student.username} - {self.status} on {self.date}"
 
     def mark_attendance(self, student, status):
         if status == 'Present':

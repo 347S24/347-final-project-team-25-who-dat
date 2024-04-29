@@ -15,7 +15,7 @@ class User(AbstractUser):
     name = CharField(_("Name of User"), blank=True, max_length=255)
     first_name = None  # type: ignore[assignment]
     last_name = None  # type: ignore[assignment]
-
+    
     phone_number = models.CharField(max_length=15, blank=True)
     # roles = models.ManyToManyField(Role)
     photo = models.ImageField(upload_to='user_photos/', blank=True)

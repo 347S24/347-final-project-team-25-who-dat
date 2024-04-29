@@ -5,7 +5,7 @@ from .models import Role, Student, Teacher, TeachingAssistant, Course, Attendanc
 import random
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 
 
 def homepage(request):
@@ -22,12 +22,81 @@ def game(request, mode):
 
     return render(request, 'homepage/game.html', {'random_students': random_students, 'answer': answer, 'course': course, 'mode': mode})
 
-def attendance(request):
-    course = Course.objects.all()
-    # course = get_object_or_404(Course, id=course_id)
-    # students = course.students.all()
-    # return render(request, 'homepage/attendance.html', {'course': course, 'students': students})
-    return render(request, 'homepage/attendance.html', {'course': course})
+def attendance_view(request):
+    # Check if the user is a professor
+    if hasattr(request.user, 'professor'):
+        return redirect('professor_attendance_dashboard')
+    # Check if the user is a student
+    elif hasattr(request.user, 'student'):
+        return redirect('student_attendance_view')
+    else:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+
+@login_required
+def student_attendance_view(request):
+    if not hasattr(request.user, 'student'):
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    # Retrieve attendance records for the current month and year
+    today = datetime.today()
+    attendance_records = Attendance.objects.filter(
+        student=request.user.student,
+        date__year=today.year,
+        date__month=today.month
+    )
+
+    # Prepare data for the calendar (example: [{'title': 'Absent', 'start': '2024-04-01', 'color': 'red'}, ...])
+    calendar_data = [
+        {
+            'title': record.get_status_display(),
+            'start': record.date.isoformat(),
+            'color': 'green' if record.status == 'present' else 'red' if record.status == 'absent' else 'white'
+        }
+        for record in attendance_records
+    ]
+
+    # Render the student's calendar view with the prepared data
+    return render(request, 'homepage/student_calendar.html', {
+        'calendar_data': json.dumps(calendar_data)  # Serialize the data to JSON for use in the template
+    })
+
+@login_required
+def professor_attendance_dashboard(request):
+     if not hasattr(request.user, 'professor'):
+        return HttpResponseForbidden("You are not authorized to view this page.")
+    # Fetch courses taught by the professor
+     courses = Course.objects.filter(instructor=request.user.professor)
+    # Render the professor's calendar view with the list of courses
+     return render(request, 'homepage/professor_calendar.html', {'courses': courses})
+
+def mark_attendance(request, course_id, date):
+    if not hasattr(request.user, 'professor'):
+        return HttpResponseForbidden("You are not authorized to perform this action.")
+    course = get_object_or_404(Course, id=course_id)
+    students = list(course.students.all())
+    random.shuffle(students)
+
+    if request.method == 'POST':
+        for student in students:
+            status = request.POST.get(f'status_{student.id}', 'none')
+            Attendance.objects.update_or_create(
+                student=student, date=date,
+                defaults={'status': status}
+            )
+        return redirect('professor_attendance_dashboard')
+
+    return render(request, 'homepage/mark_attendance.html', {
+        'course': course, 'students': students, 'date': date
+    })
+
+def view_attendance_by_status(request, course_id, date, status):
+    if not hasattr(request.user, 'professor'):
+        return HttpResponseForbidden("You are not authorized to perform this action.")
+    course = get_object_or_404(Course, id=course_id)
+    attendance_records = Attendance.objects.filter(course=course, date=date, status=status)
+    return render(request, 'homepage/view_by_status.html', {
+        'course': course, 'date': date, 'status': status, 'attendance_records': attendance_records
+    })
 
 @login_required
 def my_courses(request):
