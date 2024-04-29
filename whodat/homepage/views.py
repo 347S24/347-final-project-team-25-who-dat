@@ -15,13 +15,27 @@ def homepage(request):
 def game(request, mode):
     if not (hasattr(request.user, 'Teacher') or hasattr(request.user, 'Teachingassistant')):
         return HttpResponseForbidden("You are not authorized to play this game.")
-    course = ['Student 1', 'Student 2', 'Student 3', 'Student 4', 'Student 5', 'Student 6', 'Student 7', 'Student 8']
     
-    random_students = random.sample(course, 4)
-    answer = random.choice(random_students)
+    courses = Course.objects.filter(instructor=request.user.professor)
 
-    return render(request, 'homepage/game.html', {'random_students': random_students, 'answer': answer, 'course': course, 'mode': mode})
+    if request.method == 'POST':
+        # Handle form submission
+        selected_course_id = request.POST.get('course')
+        selected_course = Course.objects.get(pk=selected_course_id)
+        
+        # Retrieve students for the selected course
+        students = selected_course.students.all()
+        student_info = [{'name': student.student_name, 'photo': student.photo.url} for student in students]
 
+        random_students = random.sample(student_info, 4)
+        answer = random.sample(random_students, 1)
+        
+        # Pass selected course data to the template
+        return render(request, 'homepage/game.html', {'course_data': student_info,
+                                                        'random_students': random_students, 'answer': answer, 'mode': mode})
+    
+    return render(request, 'homepage/game.html', {'courses': courses, 'mode': mode})
+    
 def attendance_view(request):
     # Check if the user is a professor
     if hasattr(request.user, 'professor'):
