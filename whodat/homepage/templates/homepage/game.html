@@ -20,11 +20,12 @@
     <h1>Who Dat?</h1>
     <h2>Game Mode: {{ mode }}</h2>
 
-    <button onclick="buttonClicked(0)">study</button>
-    <button onclick="buttonClicked(1)">name</button>
-    <button onclick="buttonClicked(2)">photo</button>
+    <a href="../../../homepage/game/">study</a>
+    <a href="../../../homepage/game/name/">name</a>
+    <a href="../../../homepage/game/photo/">photo</a>
+    <a href="../../../homepage/">home</a>
 
-    <h1>Select a Course</h1>
+    {% comment %} <h1>Select a Course</h1>
     <form action="" method="POST">
         {% csrf_token %}
         <select name="course">
@@ -33,37 +34,22 @@
             {% endfor %}
         </select>
         <button type="submit">Start Game</button>
-    </form>
+    </form> {% endcomment %}
 
-    <script>
-        function buttonClicked(destination) {
-            switch(destination) {
-                case 0:
-                    window.location.href = '/game/';
-                    break;
-                case 1:
-                    window.location.href = '/game/name/';
-                    break;
-                case 2:
-                    window.location.href = '/game/photo/';
-                    break;
-            }
-        }
-    </script>
 
     {% if mode == 'name' %}
 
         <div id="question-container">
-            <img class="card-img-top" id="question-img" src="{{ student.photo }}" alt="Answer image">
+            <img class="card-img-top" id="question-img" src="{% static 'images/profile.jpeg' %}" alt="Answer image">
         </div>
 
         <div class="conatiner" id="answer-container">
 
             {% for student in random_students  %}
 
-                <button class="answer-button" onclick="checkAnswer(this, '{{ student.name }}', '{{ answer.name }}')">
+                <button class="answer-button" onclick="checkAnswer(this, '{{ student }}', '{{ answer }}')">
                     <div class="answer-card">
-                        <h5 class="card-title">{{ student.name }}</h5>
+                        <h5 class="card-title">{{ student }}</h5>
                     </div>
                 </button>
 
@@ -89,16 +75,16 @@
     {% elif mode == 'photo' %}
 
         <div id="question-container">
-            <h5 class="card-title">{{ answer.name }}</h5>
+            <h5 class="card-title">{{ answer }}</h5>
         </div>
 
         <div class="conatiner" id="answer-container">
 
             {% for student in random_students  %}
 
-                <button class="answer-button" onclick="checkAnswer(this, '{{ student.name }}', '{{ answer.name }}')">
+                <button class="answer-button" onclick="checkAnswer(this, '{{ student }}', '{{ answer }}')">
                     <div class="answer-card">
-                        <img class="card-img-top" id="answer-img" src="{{ student.photo }}" alt="Answer image">
+                        <img class="card-img-top" id="answer-img" src="{% static 'images/profile.jpeg' %}" alt="Answer image">
                     </div>
                 </button>
 
@@ -121,19 +107,21 @@
             <button class="nextButton" onclick="location.href='.'">Next</button>
         </div>
 
-    {% else %}
+    {% elif mode == 'study' %}
         <div class="conatiner" id="cardContainer">
-            {% for student in course_data %}
+            {% for student in course %}
 
                 <div class="card text-center">
-                    <img class="card-img-top" src="{{ student.photo }}" alt="student card">
+                    <img class="card-img-top" src="{% static 'images/profile.jpeg' %}" alt="Card image">
                     <div class="card-body">
-                        <h5 class="card-title">{{ student.name }}</h5>
+                        <h5 class="card-title">{{ student }}</h5>
                     </div>
                 </div>
 
             {% endfor %}
         </div>
+    {% else %}
+
     {% endif %}
     
 </body>

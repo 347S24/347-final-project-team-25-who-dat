@@ -10,11 +10,8 @@ class Role(models.Model):
     def __str__(self):
         return self.name
     
-class Student(models.Model):
-    student_name = models.CharField(max_length=10, unique=True)
+class Student(User):
     student_id = models.CharField(max_length=10, unique=True)
-    photo = models.ImageField(upload_to='student_photos', null=True, blank=True)
-    
     def __str__(self):
         return f"{self.username} - Student"
     
