@@ -24,21 +24,43 @@ def game(request, mode):
     elif request.user.is_superuser:
         # Creating a mock dataset for demonstration
         mock_course_student_dict = {
-            'History': [
-                {"name": "Emily White", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Michael Johnson", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Olivia Davis", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Daniel Martinez", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Sophia Taylor", "photo": "../../../static/images/profile.jpeg"},
+    "courses": [
+        {
+            "course_id": "HIST101",
+            "name": "History",
+            "instructor": "Stewart",
+            "schedule_time": "09:35",
+            "schedule_days": "T/TH",
+            "students": [
+                {"name": "Emily White", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg"}
             ],
-            'English': [
-                {"name": "Ethan Garcia", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Isabella Brown", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Mason Lee", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Ava Rodriguez", "photo": "../../../static/images/profile.jpeg"},
-                {"name": "Liam Martinez", "photo": "../../../static/images/profile.jpeg"},
+            "description": "Old Stuff",
+            "room_number": "123"
+        },
+        {
+            "course_id": "ENG101",
+            "name": "English",
+            "instructor": "Weikle",
+            "schedule_time": "13:50",
+            "schedule_days": "M/W/F",
+            "students": [
+                {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg"}
             ],
+            "description": "Words and Stuff",
+            "room_number": "456"
         }
+    ]
+}
+
+
         return render(request, 'homepage/game.html', {'course_student_dict': mock_course_student_dict, 'mode': mode})
 
     # Initialize a dictionary to store course names and their respective students
@@ -55,7 +77,7 @@ def game(request, mode):
 
 def attendance_view(request):
     # Check if the user is a professor
-    if hasattr(request.user, 'professor'):
+    if (hasattr(request.user, 'professor') or request.user.is_superuser):
         return redirect('professor_attendance_dashboard')
     # Check if the user is a student
     elif hasattr(request.user, 'student'):
@@ -93,15 +115,55 @@ def student_attendance_view(request):
 
 @login_required
 def professor_attendance_dashboard(request):
-     if not hasattr(request.user, 'professor'):
+     if not (hasattr(request.user, 'professor') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to view this page.")
     # Fetch courses taught by the professor
      courses = Course.objects.filter(instructor=request.user.professor)
+     
+     if request.user.is_superuser:
+        # Creating a mock dataset for demonstration
+        courses = {
+    "courses": [
+        {
+            "course_id": "HIST101",
+            "name": "History",
+            "instructor": "Stewart",
+            "schedule_time": "09:35",
+            "schedule_days": "T/TH",
+            "students": [
+                {"name": "Emily White", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg"}
+            ],
+            "description": "Old Stuff",
+            "room_number": "123"
+        },
+        {
+            "course_id": "ENG101",
+            "name": "English",
+            "instructor": "Weikle",
+            "schedule_time": "13:50",
+            "schedule_days": "M/W/F",
+            "students": [
+                {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg"}
+            ],
+            "description": "Words and Stuff",
+            "room_number": "456"
+        }
+    ]
+}
+
     # Render the professor's calendar view with the list of courses
      return render(request, 'homepage/professor_calendar.html', {'courses': courses})
 
 def mark_attendance(request, course_id, date):
-    if not hasattr(request.user, 'professor'):
+    if not (hasattr(request.user, 'professor') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to perform this action.")
     course = get_object_or_404(Course, id=course_id)
     students = list(course.students.all())
@@ -147,6 +209,45 @@ def my_courses(request):
         # print("User is a student")
         # Student's courses
         courses = request.user.student.courses.all()
+    elif request.user.is_superuser:
+        # Creating a mock dataset for demonstration
+        courses = {
+    "courses": [
+        {
+            "course_id": "HIST101",
+            "name": "History",
+            "instructor": "Stewart",
+            "schedule_time": "09:35",
+            "schedule_days": "T/TH",
+            "students": [
+                {"name": "Emily White", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg"}
+            ],
+            "description": "Old Stuff",
+            "room_number": "123"
+        },
+        {
+            "course_id": "ENG101",
+            "name": "English",
+            "instructor": "Weikle",
+            "schedule_time": "13:50",
+            "schedule_days": "M/W/F",
+            "students": [
+                {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg"},
+                {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg"}
+            ],
+            "description": "Words and Stuff",
+            "room_number": "456"
+        }
+    ]
+}
+
     else:
         # print("User is not authorized")
         return HttpResponseForbidden("You are not authorized to view this page.")

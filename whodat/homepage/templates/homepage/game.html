@@ -28,8 +28,8 @@
     <label for="course-select">Select a Course:</label>
     <select id="course-select" onchange="updateStudentList()">
         <option value="" selected disabled>Select a course</option>
-        {% for course, students in course_student_dict.items %}
-            <option value="{{ course }}">{{ course }}</option>
+        {% for course in course_student_dict.courses %}
+            <option value="{{ course.course_id }}">{{ course.course_id }}</option>
         {% endfor %}
     </select>
 
@@ -49,8 +49,12 @@
             var selectedCourse = document.getElementById('course-select').value;
             
             // Get the student list for the selected course from the JSON data
-            var students = courseStudentDict[selectedCourse] || [];
-    
+            var students = [];
+            courseStudentDict.courses.forEach(function(course) {
+                if (course.course_id === selectedCourse) {
+                    students = course.students || [];
+                }
+            });    
             // Create an empty dictionary to store student names and photos
             var studentDict = {};
     
@@ -58,7 +62,7 @@
             students.forEach(function(student) {
                 // Extract student name and photo from the student object
                 var studentName = student.name;
-                var studentPhoto = student.photo;
+                var studentPhoto = student.url;
     
                 // Add the student name and photo to the dictionary
                 studentDict[studentName] = studentPhoto;
