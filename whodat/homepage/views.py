@@ -15,12 +15,43 @@ def homepage(request):
 def game(request, mode):
     if not (hasattr(request.user, 'Teacher') or hasattr(request.user, 'Teachingassistant') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to play this game.")
-    course = ['Student 1', 'Student 2', 'Student 3', 'Student 4', 'Student 5', 'Student 6', 'Student 7', 'Student 8']
     
-    random_students = random.sample(course, 4)
-    answer = random.choice(random_students)
+    # Get courses taught by the currently signed-in teacher
+    if hasattr(request.user, 'Teacher'):
+        courses_taught = Course.objects.filter(instructor=request.user.teacher)
+    elif hasattr(request.user, 'Teachingassistant'):
+        courses_taught = Course.objects.filter(instructor=request.user.teachingassistant.supervising_teacher)
+    elif request.user.is_superuser:
+        # Creating a mock dataset for demonstration
+        mock_course_student_dict = {
+            'History': [
+                {"name": "Emily White", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Michael Johnson", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Olivia Davis", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Daniel Martinez", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Sophia Taylor", "photo": "../../../static/images/profile.jpeg"},
+            ],
+            'English': [
+                {"name": "Ethan Garcia", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Isabella Brown", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Mason Lee", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Ava Rodriguez", "photo": "../../../static/images/profile.jpeg"},
+                {"name": "Liam Martinez", "photo": "../../../static/images/profile.jpeg"},
+            ],
+        }
+        return render(request, 'homepage/game.html', {'course_student_dict': mock_course_student_dict, 'mode': mode})
 
-    return render(request, 'homepage/game.html', {'random_students': random_students, 'answer': answer, 'course': course, 'mode': mode})
+    # Initialize a dictionary to store course names and their respective students
+    course_student_dict = {}
+
+    # Iterate through the courses taught by the teacher
+    for course in courses_taught:
+        # Fetch the students enrolled in each course
+        students = course.students.all()
+        # Store the course name and its students in the dictionary
+        course_student_dict[course.name] = [student.student_name for student in students]
+
+    return render(request, 'homepage/game.html', {'course_student_dict': course_student_dict, 'mode': mode})
 
 def attendance_view(request):
     # Check if the user is a professor

@@ -12,6 +12,7 @@ class Role(models.Model):
     
 class Student(User):
     student_id = models.CharField(max_length=10, unique=True)
+    image = models.ImageField(upload_to='student_images/')
     def __str__(self):
         return f"{self.username} - Student"
     

@@ -11,7 +11,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <!-- <script src="{% static 'script/script.js' %}"></script> -->
 
     <title>Who Dat?</title>
 </head>
@@ -25,104 +24,134 @@
     <a href="../../../homepage/game/photo/">photo</a>
     <a href="../../../homepage/">home</a>
 
-    {% comment %} <h1>Select a Course</h1>
-    <form action="" method="POST">
-        {% csrf_token %}
-        <select name="course">
-            {% for course in courses %}
-                <option value="{{ course.id }}">{{ course.name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Start Game</button>
-    </form> {% endcomment %}
+    <!-- Course Selection Dropdown -->
+    <label for="course-select">Select a Course:</label>
+    <select id="course-select" onchange="updateStudentList()">
+        <option value="" selected disabled>Select a course</option>
+        {% for course, students in course_student_dict.items %}
+            <option value="{{ course }}">{{ course }}</option>
+        {% endfor %}
+    </select>
 
+    <div id="question-container"></div>
+    <div class="container" id="answer-container"></div>
+    <div class="next-question">
+        <button class="nextButton" onclick="location.href='.'">Next</button>
+    </div>
 
-    {% if mode == 'name' %}
-
-        <div id="question-container">
-            <img class="card-img-top" id="question-img" src="{% static 'images/profile.jpeg' %}" alt="Answer image">
-        </div>
-
-        <div class="conatiner" id="answer-container">
-
-            {% for student in random_students  %}
-
-                <button class="answer-button" onclick="checkAnswer(this, '{{ student }}', '{{ answer }}')">
-                    <div class="answer-card">
-                        <h5 class="card-title">{{ student }}</h5>
-                    </div>
-                </button>
-
-            {% endfor %}
-
-        </div>
-
-        <script>
-            function checkAnswer(element, selection, answer) {
-                if (selection === answer) {
-                    element.style.backgroundColor = "green";
-
-                } else {
-                    element.style.backgroundColor = "red";
-                }
-            }
-        </script>
-
-        <div class="next-question">
-            <button class="nextButton" onclick="location.href='.'">Next</button>
-        </div>
-
-    {% elif mode == 'photo' %}
-
-        <div id="question-container">
-            <h5 class="card-title">{{ answer }}</h5>
-        </div>
-
-        <div class="conatiner" id="answer-container">
-
-            {% for student in random_students  %}
-
-                <button class="answer-button" onclick="checkAnswer(this, '{{ student }}', '{{ answer }}')">
-                    <div class="answer-card">
-                        <img class="card-img-top" id="answer-img" src="{% static 'images/profile.jpeg' %}" alt="Answer image">
-                    </div>
-                </button>
-
-            {% endfor %}
-
-        </div>
-
-        <script>
-            function checkAnswer(element, selection, answer) {
-                if (selection === answer) {
-                    element.style.backgroundColor = "green";
-
-                } else {
-                    element.style.backgroundColor = "red";
-                }
-            }
-        </script>
-
-        <div class="next-question">
-            <button class="nextButton" onclick="location.href='.'">Next</button>
-        </div>
-
-    {% elif mode == 'study' %}
-        <div class="conatiner" id="cardContainer">
-            {% for student in course %}
-
-                <div class="card text-center">
-                    <img class="card-img-top" src="{% static 'images/profile.jpeg' %}" alt="Card image">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ student }}</h5>
-                    </div>
-                </div>
-
-            {% endfor %}
-        </div>
-    {% else %}
-
-    {% endif %}
+    <script>
+        // Convert the course_student_dict to JSON format
+        var courseStudentDict = {{ course_student_dict|safe }};
+        
+        // Function to update the student list based on the selected course
+        function updateStudentList() {
+            // Get the selected course value
+            var selectedCourse = document.getElementById('course-select').value;
+            
+            // Get the student list for the selected course from the JSON data
+            var students = courseStudentDict[selectedCourse] || [];
     
+            // Create an empty dictionary to store student names and photos
+            var studentDict = {};
+    
+            // Iterate over each student and store their name and photo in the dictionary
+            students.forEach(function(student) {
+                // Extract student name and photo from the student object
+                var studentName = student.name;
+                var studentPhoto = student.photo;
+    
+                // Add the student name and photo to the dictionary
+                studentDict[studentName] = studentPhoto;
+            });
+    
+            // Get four random students from studentDict
+            var randomStudentsDict = {};
+            var randomStudents = Object.keys(studentDict).sort(() => Math.random() - 0.5).slice(0, 4);
+            randomStudents.forEach(function(studentName) {
+                randomStudentsDict[studentName] = studentDict[studentName];
+            });
+    
+            // Get a random choice from the four random students
+            var randomChoiceDict = {};
+            var randomChoice = randomStudents[Math.floor(Math.random() * randomStudents.length)];
+            randomChoiceDict[randomChoice] = studentDict[randomChoice];
+            
+            var randomStudentName = Object.keys(randomChoiceDict)[0]; // Assuming there's only one key in randomChoiceDict
+            var randomStudentPhoto = randomChoiceDict[randomStudentName];
+
+            // Display question and answer based on mode
+            var questionContainer = document.getElementById("question-container");
+            var answerContainer = document.getElementById("answer-container");
+            
+            if ("{{ mode }}" == "name") {
+                questionContainer.innerHTML = '<img class="card-img-top" id="question-img" src="' + randomStudentPhoto + '" alt="Question image">';
+                answerContainer.innerHTML = '';
+                for (var studentName in randomStudentsDict) {
+                    var button = document.createElement("button");
+                    button.className = "answer-button";
+                    button.setAttribute("onclick", "checkAnswer(this, '" + studentName + "', '" + randomStudentName + "')");
+                    var answerCard = document.createElement("div");
+                    answerCard.className = "answer-card";
+                    var cardTitle = document.createElement("h5");
+                    cardTitle.className = "card-title";
+                    cardTitle.textContent = studentName;
+                    answerCard.appendChild(cardTitle);
+                    button.appendChild(answerCard);
+                    answerContainer.appendChild(button);
+                }
+            } else if ("{{ mode }}" == "photo") {
+                questionContainer.innerHTML = '<h5 class="card-title" id="answer">' + randomStudentName + '</h5>';
+                answerContainer.innerHTML = '';
+                for (var studentName in randomStudentsDict) {
+                    var studentPhoto = randomStudentsDict[studentName];
+                    var button = document.createElement("button");
+                    button.className = "answer-button";
+                    button.setAttribute("onclick", "checkAnswer(this, '" + studentName + "', '" + randomStudentName + "')");
+                    var answerCard = document.createElement("div");
+                    answerCard.className = "answer-card";
+                    var img = document.createElement("img");
+                    img.className = "card-img-top";
+                    img.setAttribute("src", studentPhoto);
+                    img.setAttribute("alt", "Answer image");
+                    answerCard.appendChild(img);
+                    button.appendChild(answerCard);
+                    answerContainer.appendChild(button);
+                }
+            } else if ("{{ mode }}" == "study") {
+                questionContainer.innerHTML = '';
+                answerContainer.innerHTML = '';
+                for (var studentName in studentDict) {
+                    var studentPhoto = studentDict[studentName];
+                    var card = document.createElement("div");
+                    card.className = "card";
+                    var img = document.createElement("img");
+                    img.className = "card-img-top";
+                    img.setAttribute("src", studentPhoto);
+                    img.setAttribute("alt", "Student photo");
+                    var cardBody = document.createElement("div");
+                    cardBody.className = "card-body";
+                    var cardTitle = document.createElement("h5");
+                    cardTitle.className = "card-title";
+                    cardTitle.textContent = studentName;
+                    cardBody.appendChild(cardTitle);
+                    card.appendChild(img);
+                    card.appendChild(cardBody);
+                    answerContainer.appendChild(card);
+                }
+            }
+        }
+
+        // Function to check the answer
+        function checkAnswer(element, selection, answer) {
+            if (selection === answer) {
+                element.style.backgroundColor = "green";
+            } else {
+                element.style.backgroundColor = "red";
+            }
+        }
+        
+        // Call updateStudentList when the page loads
+        window.onload = updateStudentList;
+    </script>
 </body>
 </html>
