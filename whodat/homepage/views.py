@@ -6,6 +6,8 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
+from calendar import monthrange
+from datetime import datetime
 
 
 def homepage(request):
@@ -115,7 +117,7 @@ def student_attendance_view(request):
 
 @login_required
 def professor_attendance_dashboard(request):
-     if not (hasattr(request.user, 'professor') or request.user.is_superuser):
+     if not (hasattr(request.user, 'teacher') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to view this page.")
     # Fetch courses taught by the professor
      courses = Course.objects.filter(instructor=request.user.teacher)
@@ -159,8 +161,28 @@ def professor_attendance_dashboard(request):
     ]
 }
 
+        # Get calendar data
+        now = datetime.now()
+        year = now.year
+        month = now.month
+
+        # Get num days in current month
+        num_days = monthrange(year, month)[1]
+        days = list(range(1, num_days + 1))
+
+        # Pass year and month names for display
+        courses = Course.objects.all()
+        context = {
+            'year': year,
+            'month': now.strftime('%B'),
+            'days': days,
+            'courses': courses
+        }
+
+        return render(request, 'homepage/professor_calendar.html', context)
+
     # Render the professor's calendar view with the list of courses
-     return render(request, 'homepage/professor_calendar.html', {'courses': courses})
+     # return render(request, 'homepage/professor_calendar.html', {'courses': courses})
 
 def mark_attendance(request, course_id, date):
     if not (hasattr(request.user, 'professor') or request.user.is_superuser):

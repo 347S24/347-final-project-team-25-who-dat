@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Who Dat?</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/js/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+
+    <style>
+        .calendar-grid {
+            display: flex;
+            flex-wrap: wrap;
+            width: 350px;
+        }
+        /* Initially hide the calendar grid and attendance buttons */
+        .calendar-grid, .attendance-buttons {
+            display: none;
+        }
+        .day-box {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            text-align: center;
+            line-height: 50px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Professor Calendar - {{ month }} {{ year }}</h1>
+    <a href="../../../homepage/">home</a>
+
+    <!-- Course Selection Dropdown -->
+    <label for="course-select">Select a Course:</label>
+    <select id="course-select">
+        <option value="" selected disabled>Select a course</option>
+        {% for course in courses %}
+            <option value="{{ course.course_id }}">{{ course.course_id }} - {{ course.name }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Calendar Grid -->
+    <div id="calendar-grid" class="calendar-grid">
+        {% for day in days %}
+            <div class="day-box" onclick="showAttendanceButtons({{ day }})">
+                {{ day }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Attendance Buttons -->
+    <div class="attendance-buttons" id="attendance-buttons">
+        <h3>Actions for Day <span id="selected-day"></span></h3>
+        <button>Mark Attendance</button>
+        <button>Modify Attendance</button>
+        <button>View Presents</button>
+        <button>View Absents</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var courseSelect = document.getElementById('course-select');
+            var calendarGrid = document.getElementById('calendar-grid');
+            var attendanceButtons = document.getElementById('attendance-buttons');
+
+            // Ensure all expected elements are found
+            if (courseSelect && calendarGrid && attendanceButtons) {
+                courseSelect.addEventListener('change', function() {
+                    var selectedCourse = this.value;
+
+                    if (selectedCourse) {
+                        // Make the calendar and attendance buttons visible
+                        console.log("Course selected:", selectedCourse);
+                        calendarGrid.style.display = 'flex';
+                        attendanceButtons.style.display = 'block';
+                    }
+                });
+            } else {
+                console.error("One or more required elements were not found.");
+            }
+        });
+
+        // Function to show attendance buttons for the selected day
+        function showAttendanceButtons(day) {
+            console.log("Day selected:", day);
+            document.getElementById('selected-day').innerText = day;
+        }
+    </script>
+</body>
+</html>
