@@ -77,11 +77,11 @@ def game(request, mode):
 
 def attendance_view(request):
     # Check if the user is a professor
-    if (hasattr(request.user, 'professor') or request.user.is_superuser):
-        return redirect('professor_attendance_dashboard')
+    if (hasattr(request.user, 'teacher') or request.user.is_superuser):
+        return redirect('homepage:professor_attendance_dashboard')
     # Check if the user is a student
     elif hasattr(request.user, 'student'):
-        return redirect('student_attendance_view')
+        return redirect('homepage:student_attendance_view')
     else:
         return HttpResponseForbidden("You are not authorized to access this page.")
 
@@ -118,7 +118,7 @@ def professor_attendance_dashboard(request):
      if not (hasattr(request.user, 'professor') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to view this page.")
     # Fetch courses taught by the professor
-     courses = Course.objects.filter(instructor=request.user.professor)
+     courses = Course.objects.filter(instructor=request.user.teacher)
      
      if request.user.is_superuser:
         # Creating a mock dataset for demonstration
