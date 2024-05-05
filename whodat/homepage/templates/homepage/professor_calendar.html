@@ -19,7 +19,7 @@
             width: 350px;
         }
         /* Initially hide the calendar grid and attendance buttons */
-        .calendar-grid, .attendance-buttons {
+        .calendar-grid, .attendance-buttons, .students-list {
             display: none;
         }
         .day-box {
@@ -60,8 +60,23 @@
         <h3>Actions for Day <span id="selected-day"></span></h3>
         <button>Mark Attendance</button>
         <button>Modify Attendance</button>
-        <button>View Presents</button>
-        <button>View Absents</button>
+        <button onclick="viewPresents()">View Presents</button>
+        <button onclick="viewAbsents()">View Absents</button>
+    </div>
+
+    <!-- Students List -->
+    <div id="students-list" class="students-list" style="display:none;">
+        <pre>{{ courses.students }}</pre>
+        <h3>Students List</h3>
+        <ul id="students-list-content">
+            {% for student in courses.students %}
+                <li>
+                    <img src="{{ student.url }}" alt="{{ student.name }}" width="50" height="50">
+                    {{ student.name }} - {{ student.status }}
+                </li>
+            {% endfor %}
+        </ul>
+        <button onclick="closeStudentsList()">Close</button>
     </div>
 
     <script>
@@ -92,6 +107,55 @@
             console.log("Day selected:", day);
             document.getElementById('selected-day').innerText = day;
         }
+
+        // Display the list of students marked as present (initially empty)
+        function viewPresents() {
+            var studentsList = document.getElementById('student-list')
+            var listContent = document.getElementById('student-list-content')
+
+            // Filter to only show students marked as present
+            var presentStudents = Array.from(listContent.getElementsByTagName('li')).filter(function (item) {
+                return item.innerText.includes('present');
+            });
+
+            listContent.innerHTML = presentStudents.length ? presentStudents.map(function (item) {
+                return '<li>' + item.innerHTML + '</li>';
+            }).join('') : '<li>No students are present</li>';
+
+            // Show the list
+            studentsList.style.display = 'block';
+        }
+
+        // Function to view students marked as "absent"
+        function viewAbsents() {
+            var studentsList = document.getElementById('students-list');
+            var listContent = document.getElementById('students-list-content');
+
+            // Extract the existing students from the list
+            var allStudents = Array.from(listContent.getElementsByTagName('li'));
+
+            // Filter students that are marked as "absent"
+            var absentStudents = allStudents.filter(function(item) {
+                return item.innerText.includes('absent');
+            });
+
+            // Check if any students are absent
+            if (absentStudents.length) {
+                listContent.innerHTML = absentStudents.map(function(item) {
+                    return '<li>' + item.innerHTML + '</li>';
+                }).join('');
+            } else {
+                listContent.innerHTML = '<li>All students are present</li>';
+            }
+
+            // Show the modal/list
+            studentsList.style.display = 'block';
+        }
+
+        function closeStudentsList() {
+            document.getElementById('students-list').style.display = 'none';
+        }
+
     </script>
 </body>
 </html>

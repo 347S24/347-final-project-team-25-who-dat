@@ -120,7 +120,7 @@ def professor_attendance_dashboard(request):
      if not (hasattr(request.user, 'teacher') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to view this page.")
     # Fetch courses taught by the professor
-     courses = Course.objects.filter(instructor=request.user.teacher)
+     #courses = Course.objects.filter(instructor=request.user.teacher)
      
      if request.user.is_superuser:
         # Creating a mock dataset for demonstration
@@ -171,14 +171,24 @@ def professor_attendance_dashboard(request):
         days = list(range(1, num_days + 1))
 
         # Pass year and month names for display
-        courses = Course.objects.all()
+        #courses = Course.objects.all()
+        # selected_course_id = request.GET.get('course_id')
+        # students = []
+
+        # if selected_course_id:
+        #     selected_course = get_object_or_404(Course, pk=selected_course_id)
+        #     students = [{'name': student.name, 'photo_url': student.photo.url, 'status': 'absent'} for student in selected_course.students.all()]
+
+        # print("Courses:", courses)
         context = {
             'year': year,
             'month': now.strftime('%B'),
             'days': days,
-            'courses': courses
+            'courses': courses["courses"]
+            #'students': students
         }
 
+        # return render(request, 'homepage/professor_calendar.html', context)
         return render(request, 'homepage/professor_calendar.html', context)
 
     # Render the professor's calendar view with the list of courses
