@@ -31,20 +31,20 @@
             border: 1px solid #ccc;
             cursor: pointer;
         }
+        .selected-day {
+            border: 2px solid blue;
+        }
     </style>
+
+    <script>
+        // Pass all courses data to JavaScript
+        var allCoursesData = {{ courses|safe }};
+        console.log("All Courses DATA INIT: " + allCoursesData);
+    </script>
 </head>
 <body>
     <h1>Professor Calendar - {{ month }} {{ year }}</h1>
     <a href="../../../homepage/">home</a>
-
-    <!-- Course Selection Dropdown -->
-    <label for="course-select">Select a Course:</label>
-    <select id="course-select">
-        <option value="" selected disabled>Select a course</option>
-        {% for course in courses %}
-            <option value="{{ course.course_id }}">{{ course.course_id }} - {{ course.name }}</option>
-        {% endfor %}
-    </select>
 
     <!-- Calendar Grid -->
     <div id="calendar-grid" class="calendar-grid">
@@ -55,106 +55,126 @@
         {% endfor %}
     </div>
 
+    <!-- Dropdown to select a course -->
+    <label for="course-select">Select a Course:</label>
+    <select id="course-select">
+        <option value="" selected disabled>Select a course</option>
+        {% for course in courses %}
+            <option value="{{ course.course_id }}">{{ course.course_id }} - {{ course.name }}</option>
+        {% endfor %}
+    </select>
+
     <!-- Attendance Buttons -->
-    <div class="attendance-buttons" id="attendance-buttons">
-        <h3>Actions for Day <span id="selected-day"></span></h3>
-        <button>Mark Attendance</button>
-        <button>Modify Attendance</button>
-        <button onclick="viewPresents()">View Presents</button>
-        <button onclick="viewAbsents()">View Absents</button>
+    <div class="attendance-buttons">
+        <button onclick="viewAbsentStudents()">View Absent</button>
+        <button onclick="viewPresentStudents()">View Present</button>
     </div>
 
     <!-- Students List -->
     <div id="students-list" class="students-list" style="display:none;">
-        <pre>{{ courses.students }}</pre>
         <h3>Students List</h3>
-        <ul id="students-list-content">
-            {% for student in courses.students %}
-                <li>
-                    <img src="{{ student.url }}" alt="{{ student.name }}" width="50" height="50">
-                    {{ student.name }} - {{ student.status }}
-                </li>
-            {% endfor %}
-        </ul>
+        <ul id="students-list-content"></ul>
         <button onclick="closeStudentsList()">Close</button>
     </div>
 
     <script>
+        let selectedCourseId = null;
+
+        // Track the selected course from the dropdown
         document.addEventListener('DOMContentLoaded', function() {
-            var courseSelect = document.getElementById('course-select');
-            var calendarGrid = document.getElementById('calendar-grid');
-            var attendanceButtons = document.getElementById('attendance-buttons');
+            const courseSelect = document.getElementById('course-select');
+            // const attendanceButtons = document.querySelector('.attendance-buttons');
+            const calendarGrid = document.getElementById('calendar-grid');
+            const dayBoxes = document.querySelectorAll('.day-box');
 
-            // Ensure all expected elements are found
-            if (courseSelect && calendarGrid && attendanceButtons) {
+            if (courseSelect) {
                 courseSelect.addEventListener('change', function() {
-                    var selectedCourse = this.value;
-
-                    if (selectedCourse) {
-                        // Make the calendar and attendance buttons visible
-                        console.log("Course selected:", selectedCourse);
-                        calendarGrid.style.display = 'flex';
-                        attendanceButtons.style.display = 'block';
-                    }
+                    selectedCourseId = this.value; // Update the global selected course ID
+                    // Show the attendance buttons once a course is selected
+                    
+                    // attendanceButtons.style.display = 'block';
+                    calendarGrid.style.display = 'flex';
                 });
-            } else {
-                console.error("One or more required elements were not found.");
             }
+
+            // Select days with border
+            let currentSelectedDay = null;
+            dayBoxes.forEach(dayBox => {
+                dayBox.addEventListener('click', function() {
+                    // Remove the highlight from the previously selected day
+                    if (currentSelectedDay) {
+                        currentSelectedDay.classList.remove('selected-day');
+                    }
+
+                    // Highlight the newly selected day
+                    this.classList.add('selected-day');
+                    currentSelectedDay = this; // Update the reference to the current day
+                });
+            });
         });
 
-        // Function to show attendance buttons for the selected day
         function showAttendanceButtons(day) {
-            console.log("Day selected:", day);
-            document.getElementById('selected-day').innerText = day;
+            const attendanceButtons = document.querySelector('.attendance-buttons');
+            attendanceButtons.style.display = 'block';
         }
 
-        // Display the list of students marked as present (initially empty)
-        function viewPresents() {
-            var studentsList = document.getElementById('student-list')
-            var listContent = document.getElementById('student-list-content')
-
-            // Filter to only show students marked as present
-            var presentStudents = Array.from(listContent.getElementsByTagName('li')).filter(function (item) {
-                return item.innerText.includes('present');
-            });
-
-            listContent.innerHTML = presentStudents.length ? presentStudents.map(function (item) {
-                return '<li>' + item.innerHTML + '</li>';
-            }).join('') : '<li>No students are present</li>';
-
-            // Show the list
-            studentsList.style.display = 'block';
-        }
-
-        // Function to view students marked as "absent"
-        function viewAbsents() {
-            var studentsList = document.getElementById('students-list');
-            var listContent = document.getElementById('students-list-content');
-
-            // Extract the existing students from the list
-            var allStudents = Array.from(listContent.getElementsByTagName('li'));
-
-            // Filter students that are marked as "absent"
-            var absentStudents = allStudents.filter(function(item) {
-                return item.innerText.includes('absent');
-            });
-
-            // Check if any students are absent
-            if (absentStudents.length) {
-                listContent.innerHTML = absentStudents.map(function(item) {
-                    return '<li>' + item.innerHTML + '</li>';
-                }).join('');
-            } else {
-                listContent.innerHTML = '<li>All students are present</li>';
+        // Function to show students based on attendance status
+        function showStudentsByStatus(status) {
+            if (!selectedCourseId) {
+                alert('Please select a course first.');
+                return;
             }
 
-            // Show the modal/list
-            studentsList.style.display = 'block';
+            // Retrieve all courses data
+            const allCourses = window.allCoursesData || [];
+            // console.log("All Courses: " + allCourses);
+            // console.table(allCourses);
+
+            // Find the selected course's data
+            const selectedCourse = allCourses.find(course => course.course_id === selectedCourseId);
+            // console.log("SELECTED COURSE: " + selectedCourse);
+            console.table(selectedCourse);
+
+            // Make sure the course is found and has students
+            if (!selectedCourse || !selectedCourse.students) {
+                alert('No students found for the selected course.');
+                return;
+            }
+
+            // Filter students based on the provided status (e.g., 'present' or 'absent')
+            const filteredStudents = selectedCourse.students.filter(student => student.status === status);
+            console.log(filteredStudents);
+
+            // Generate the HTML list of students based on their status
+            const listContent = document.getElementById('students-list-content');
+            listContent.innerHTML = filteredStudents.length
+                ? filteredStudents.map(student => `
+                    <li>
+                        <img src="${student.url}" alt="${student.name}" width="50" height="50">
+                        ${student.name} - ${student.status}
+                    </li>
+                `).join('')
+                : `<li>No students are ${status}</li>`;
+
+            // Show the students list
+            document.getElementById('students-list').style.display = 'block';
         }
 
+        // Convenience functions to call with a specific status
+        function viewAbsentStudents() {
+            showStudentsByStatus('absent');
+        }
+
+        function viewPresentStudents() {
+            showStudentsByStatus('present');
+        }
+
+        // Function to close the student list
         function closeStudentsList() {
             document.getElementById('students-list').style.display = 'none';
         }
+
+
 
     </script>
 </body>
