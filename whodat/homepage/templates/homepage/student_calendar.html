@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Student Calendar</title>
+    <style>
+        .calendar-grid {
+            display: flex;
+            flex-wrap: wrap;
+            width: 350px;
+            margin-top: 20px;
+        }
+        .day-box {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            text-align: center;
+            line-height: 50px;
+            border: 1px solid #ccc;
+        }
+        .day-present {
+            border: 2px solid green;
+        }
+        .day-absent {
+            border: 2px solid red;
+        }
+        .calendar-grid, #calendar-grid {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Student Calendar - {{ month }} {{ year }}</h1>
+
+<!-- Dropdown to select a course -->
+<label for="course-select">Select a Course:</label>
+<select id="course-select" onchange="showCalendar()">
+    <option value="" selected disabled>Select a course</option>
+    {% for course in courses %}
+        <option value="{{ course.course_id }}">{{ course.course_id }} - {{ course.name }}</option>
+    {% endfor %}
+</select>
+
+<!-- Calendar Grid -->
+<div id="calendar-grid" class="calendar-grid">
+    {% for day in days %}
+        <div class="day-box" data-day="{{ day }}">
+            {{ day }}
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    // Function to show the calendar when a course is selected
+    function showCalendar() {
+        var selectedCourse = document.getElementById('course-select').value;
+
+        // If a course is selected, show the calendar
+        if (selectedCourse) {
+            document.getElementById('calendar-grid').style.display = 'flex';
+        }
+
+        // Parse the attendance data passed from the server
+        const attendanceByDay = {{ attendance_by_day|safe }};
+        const dayBoxes = document.querySelectorAll('.day-box');
+
+        // Highlight each day based on attendance status
+        dayBoxes.forEach(dayBox => {
+            const day = dayBox.dataset.day;
+            const status = attendanceByDay[day];
+
+            if (status === 'present') {
+                dayBox.classList.add('day-present');
+            } else if (status === 'absent') {
+                dayBox.classList.add('day-absent');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

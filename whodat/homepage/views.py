@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from calendar import monthrange
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date
+from collections import defaultdict
 
 
 def homepage(request):
@@ -93,28 +93,62 @@ def student_attendance_view(request):
     if not hasattr(request.user, 'student'):
         return HttpResponseForbidden("You are not authorized to view this page.")
 
-    # Retrieve attendance records for the current month and year
-    today = datetime.today()
-    attendance_records = Attendance.objects.filter(
-        student=request.user.student,
-        date__year=today.year,
-        date__month=today.month
-    )
+    # Mock student data
+    student = request.user.student
+    today = date.today()
 
-    # Prepare data for the calendar (example: [{'title': 'Absent', 'start': '2024-04-01', 'color': 'red'}, ...])
-    calendar_data = [
-        {
-            'title': record.get_status_display(),
-            'start': record.date.isoformat(),
-            'color': 'green' if record.status == 'present' else 'red' if record.status == 'absent' else 'white'
-        }
-        for record in attendance_records
-    ]
+    # Mock courses (replace with actual query or logic)
+    # Creating a mock dataset for demonstration
+    courses = {
+        "courses": [
+            {
+                "course_id": "HIST101",
+                "name": "History",
+                "students": [
+                    {"name": "Emily White", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg", "status": "absent"}
+                ]
+            },
+            {
+                "course_id": "ENG101",
+                "name": "English",
+                "students": [
+                    {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg", "status": "absent"}
+                ]
+            }
+        ]
+    }
 
-    # Render the student's calendar view with the prepared data
-    return render(request, 'homepage/student_calendar.html', {
-        'calendar_data': json.dumps(calendar_data)  # Serialize the data to JSON for use in the template
-    })
+    # Create a mock attendance data dictionary, mapping each day to an attendance status
+    num_days = (date(today.year, today.month + 1, 1) - date(today.year, today.month, 1)).days
+    attendance_by_day = defaultdict(lambda: 'absent')  # Default status is 'absent'
+
+    # Example attendance data
+    attendance_data = {
+        1: 'present', 2: 'present', 3: 'absent', 4: 'present',
+        5: 'absent', 6: 'present', 7: 'present', 8: 'absent'
+    }
+
+    for day, status in attendance_data.items():
+        if 1 <= day <= num_days:
+            attendance_by_day[day] = status
+
+    context = {
+        'year': today.year,
+        'month': today.strftime('%B'),
+        'days': list(range(1, num_days + 1)),
+        'attendance_by_day': dict(attendance_by_day),
+        'courses': courses["courses"]
+    }
+
+    return render(request, 'homepage/student_calendar.html', context)
 
 @login_required
 def professor_attendance_dashboard(request):
