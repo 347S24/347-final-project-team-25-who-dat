@@ -66,8 +66,10 @@
 
     <!-- Attendance Buttons -->
     <div class="attendance-buttons">
-        <button onclick="viewAbsentStudents()">View Absent</button>
+        <button>Mark Attendance</button>
+        <button>Modify Attendance</button>
         <button onclick="viewPresentStudents()">View Present</button>
+        <button onclick="viewAbsentStudents()">View Absent</button>
     </div>
 
     <!-- Students List -->
@@ -109,6 +111,9 @@
                     // Highlight the newly selected day
                     this.classList.add('selected-day');
                     currentSelectedDay = this; // Update the reference to the current day
+
+                    // Hide the students list when a new day is selected
+                    closeStudentsList();
                 });
             });
         });
@@ -127,23 +132,18 @@
 
             // Retrieve all courses data
             const allCourses = window.allCoursesData || [];
-            // console.log("All Courses: " + allCourses);
-            // console.table(allCourses);
 
             // Find the selected course's data
             const selectedCourse = allCourses.find(course => course.course_id === selectedCourseId);
-            // console.log("SELECTED COURSE: " + selectedCourse);
-            console.table(selectedCourse);
 
-            // Make sure the course is found and has students
+            // Ensure the course is found and has students
             if (!selectedCourse || !selectedCourse.students) {
                 alert('No students found for the selected course.');
                 return;
             }
 
-            // Filter students based on the provided status (e.g., 'present' or 'absent')
+            // Filter students based on the provided status (e.g., 'present', 'absent', etc.)
             const filteredStudents = selectedCourse.students.filter(student => student.status === status);
-            console.log(filteredStudents);
 
             // Generate the HTML list of students based on their status
             const listContent = document.getElementById('students-list-content');

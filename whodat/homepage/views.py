@@ -8,6 +8,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from calendar import monthrange
 from datetime import datetime
+from datetime import date
 
 
 def homepage(request):
@@ -117,82 +118,62 @@ def student_attendance_view(request):
 
 @login_required
 def professor_attendance_dashboard(request):
-     if not (hasattr(request.user, 'teacher') or request.user.is_superuser):
+    if not (hasattr(request.user, 'teacher') or request.user.is_superuser):
         return HttpResponseForbidden("You are not authorized to view this page.")
-    # Fetch courses taught by the professor
-     #courses = Course.objects.filter(instructor=request.user.teacher)
-     
-     if request.user.is_superuser:
-        # Creating a mock dataset for demonstration
-        courses = {
-    "courses": [
-        {
-            "course_id": "HIST101",
-            "name": "History",
-            "instructor": "Stewart",
-            "schedule_time": "09:35",
-            "schedule_days": "T/TH",
-            "students": [
-                {"name": "Emily White", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg"}
-            ],
-            "description": "Old Stuff",
-            "room_number": "123"
-        },
-        {
-            "course_id": "ENG101",
-            "name": "English",
-            "instructor": "Weikle",
-            "schedule_time": "13:50",
-            "schedule_days": "M/W/F",
-            "students": [
-                {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg"}
-            ],
-            "description": "Words and Stuff",
-            "room_number": "456"
-        }
-    ]
-}
 
-        # Get calendar data
-        now = datetime.now()
-        year = now.year
-        month = now.month
+    today = date.today()
 
-        # Get num days in current month
-        num_days = monthrange(year, month)[1]
-        days = list(range(1, num_days + 1))
+    # Creating a mock dataset for demonstration
+    courses = {
+        "courses": [
+            {
+                "course_id": "HIST101",
+                "name": "History",
+                "students": [
+                    {"name": "Emily White", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg", "status": "absent"}
+                ]
+            },
+            {
+                "course_id": "ENG101",
+                "name": "English",
+                "students": [
+                    {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg", "status": "absent"},
+                    {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg", "status": "absent"}
+                ]
+            }
+        ]
+    }
 
-        # Pass year and month names for display
-        #courses = Course.objects.all()
-        # selected_course_id = request.GET.get('course_id')
-        # students = []
+    # Optional: Update this part only if using real database records
+    for course in courses["courses"]:
+        try:
+            # If the course exists in the database, we can fetch its attendance records
+            course_instance = Course.objects.get(course_id=course["course_id"])
+            attendance_records = Attendance.objects.filter(course=course_instance, date=today)
 
-        # if selected_course_id:
-        #     selected_course = get_object_or_404(Course, pk=selected_course_id)
-        #     students = [{'name': student.name, 'photo_url': student.photo.url, 'status': 'absent'} for student in selected_course.students.all()]
+            # Update each student's status based on attendance records
+            for student in course["students"]:
+                attendance_record = attendance_records.filter(student__name=student["name"]).first()
+                student["status"] = attendance_record.status if attendance_record else 'none'
+        except Course.DoesNotExist:
+            # If the course is not found in the database, handle it gracefully
+            continue
 
-        # print("Courses:", courses)
-        context = {
-            'year': year,
-            'month': now.strftime('%B'),
-            'days': days,
-            'courses': courses["courses"]
-            #'students': students
-        }
+    context = {
+        'year': today.year,
+        'month': today.strftime('%B'),
+        'days': list(range(1, 32)),
+        'courses': courses["courses"]
+    }
 
-        # return render(request, 'homepage/professor_calendar.html', context)
-        return render(request, 'homepage/professor_calendar.html', context)
-
-    # Render the professor's calendar view with the list of courses
-     # return render(request, 'homepage/professor_calendar.html', {'courses': courses})
+    return render(request, 'homepage/professor_calendar.html', context)
 
 def mark_attendance(request, course_id, date):
     if not (hasattr(request.user, 'professor') or request.user.is_superuser):
