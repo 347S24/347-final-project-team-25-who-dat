@@ -185,7 +185,6 @@ def professor_attendance_dashboard(request):
         ]
     }
 
-    # Optional: Update this part only if using real database records
     for course in courses["courses"]:
         try:
             # If the course exists in the database, we can fetch its attendance records
