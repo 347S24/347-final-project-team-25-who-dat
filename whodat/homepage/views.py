@@ -9,6 +9,10 @@ from django.shortcuts import get_object_or_404
 from calendar import monthrange
 from datetime import datetime, date
 from collections import defaultdict
+from django.db.models import Prefetch
+from django.http import JsonResponse
+from django.core.serializers import serialize
+
 
 
 def homepage(request):
@@ -26,57 +30,46 @@ def game(request, mode):
         courses_taught = Course.objects.filter(instructor=request.user.teachingassistant.supervising_teacher)
     elif request.user.is_superuser:
         # Creating a mock dataset for demonstration
-        mock_course_student_dict = {
-    "courses": [
-        {
-            "course_id": "HIST101",
-            "name": "History",
-            "instructor": "Stewart",
-            "schedule_time": "09:35",
-            "schedule_days": "T/TH",
-            "students": [
-                {"name": "Emily White", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg"}
-            ],
-            "description": "Old Stuff",
-            "room_number": "123"
-        },
-        {
-            "course_id": "ENG101",
-            "name": "English",
-            "instructor": "Weikle",
-            "schedule_time": "13:50",
-            "schedule_days": "M/W/F",
-            "students": [
-                {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg"},
-                {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg"}
-            ],
-            "description": "Words and Stuff",
-            "room_number": "456"
+        courses_taught = {
+            "courses": [
+                {
+                    "course_id": "CS347",
+                    "name": "Application Development",
+                    "instructor": "Stewart",
+                    "schedule_time": "09:35",
+                    "schedule_days": "T/TH",
+                    "students": [
+                        {"name": "Emily White", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Olivia Davis", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Daniel Martinez", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Sophia Taylor", "url": "../../../static/images/profile.jpeg"}
+                    ],
+                    "description": "Old Stuff",
+                    "room_number": "249"
+                },
+                {
+                    "course_id": "CS412",
+                    "name": "Applied Algorithms",
+                    "instructor": "Malloy",
+                    "schedule_time": "13:50",
+                    "schedule_days": "M/W/F",
+                    "students": [
+                        {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Mason Lee", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Ava Rodriguez", "url": "../../../static/images/profile.jpeg"},
+                        {"name": "Liam Martinez", "url": "../../../static/images/profile.jpeg"}
+                    ],
+                    "description": "Words and Stuff",
+                    "room_number": "256"
+                }
+            ]
         }
-    ]
-}
 
+        # courses_taught = Course.objects.all
 
-        return render(request, 'homepage/game.html', {'course_student_dict': mock_course_student_dict, 'mode': mode})
-
-    # Initialize a dictionary to store course names and their respective students
-    course_student_dict = {}
-
-    # Iterate through the courses taught by the teacher
-    for course in courses_taught:
-        # Fetch the students enrolled in each course
-        students = course.students.all()
-        # Store the course name and its students in the dictionary
-        course_student_dict[course.name] = [student.student_name for student in students]
-
-    return render(request, 'homepage/game.html', {'course_student_dict': course_student_dict, 'mode': mode})
+    return render(request, 'homepage/game.html', {'course_student_dict': courses_taught, 'mode': mode})
 
 def attendance_view(request):
     # Check if the user is a professor
@@ -102,8 +95,8 @@ def student_attendance_view(request):
     courses = {
         "courses": [
             {
-                "course_id": "HIST101",
-                "name": "History",
+                "course_id": "CS347",
+                "name": "Application Design",
                 "students": [
                     {"name": "Emily White", "url": "../../../static/images/profile.jpeg", "status": "absent"},
                     {"name": "Michael Johnson", "url": "../../../static/images/profile.jpeg", "status": "absent"},
@@ -113,8 +106,8 @@ def student_attendance_view(request):
                 ]
             },
             {
-                "course_id": "ENG101",
-                "name": "English",
+                "course_id": "CS412",
+                "name": "Applied Algorithms",
                 "students": [
                     {"name": "Ethan Garcia", "url": "../../../static/images/profile.jpeg", "status": "absent"},
                     {"name": "Isabella Brown", "url": "../../../static/images/profile.jpeg", "status": "absent"},
@@ -315,5 +308,5 @@ def my_courses(request):
     
     print("Courses:", courses)
     
-    return render(request, 'homepage/my_courses.html', {'courses': courses})
+    return render(request, 'homepage/my_courses.html', {'courses': Course.objects.all})
 
