@@ -187,7 +187,6 @@ def professor_attendance_dashboard(request):
 
     for course in courses["courses"]:
         try:
-            # If the course exists in the database, we can fetch its attendance records
             course_instance = Course.objects.get(course_id=course["course_id"])
             attendance_records = Attendance.objects.filter(course=course_instance, date=today)
 
@@ -228,14 +227,30 @@ def mark_attendance(request, course_id, date):
         'course': course, 'students': students, 'date': date
     })
 
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseForbidden
+from .models import Course, Attendance
+
 def view_attendance_by_status(request, course_id, date, status):
     if not hasattr(request.user, 'professor'):
         return HttpResponseForbidden("You are not authorized to perform this action.")
     course = get_object_or_404(Course, id=course_id)
-    attendance_records = Attendance.objects.filter(course=course, date=date, status=status)
+    attendance_records = Attendance.objects.filter(course=course, date=date, status=status).select_related('student')
+
+    # Prepare the data to be displayed in the template.
+    students = [{
+        'name': record.student.name,
+        'status': record.status,
+        'image_url': record.student.image.url
+    } for record in attendance_records]
+
     return render(request, 'homepage/view_by_status.html', {
-        'course': course, 'date': date, 'status': status, 'attendance_records': attendance_records
+        'course': course,
+        'date': date,
+        'status': status,
+        'students': students
     })
+
 
 @login_required
 def my_courses(request):

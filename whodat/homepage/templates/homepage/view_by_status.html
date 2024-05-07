@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Attendance by Status</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <style>
+        .student-card {
+            border: 2px solid; /* Default border */
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        .absent {
+            border-color: red; /* Red border for absent students */
+        }
+        .present {
+            border-color: green; /* Green border for present students */
+        }
+        img {
+            width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <h1>Attendance for {{ date }} - {{ status }}</h1>
+        {% if students %}
+            {% for student in students %}
+                <div class="student-card {% if student.status == 'absent' %}absent{% else %}present{% endif %}">
+                    <img src="{{ student.image_url }}" alt="{{ student.name }}">
+                    <p>{{ student.name }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No students found for this status on the selected date.</p>
+        {% endif %}
+        <a href="{% url 'professor_attendance_dashboard' %}">Back to Calendar</a>
+    </div>
+</body>
+</html>
